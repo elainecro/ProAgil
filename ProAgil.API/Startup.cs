@@ -31,6 +31,7 @@ namespace ProAgil.API
             {
                 x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<IProAgilRepositorio, ProAgilRepositorio>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors();
         }
