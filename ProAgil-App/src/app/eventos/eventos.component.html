@@ -44,8 +44,14 @@
         </div>
       </td>
       <td>
-        <button class="btn btn-success"></button>
-        <button class="btn btn-danger"></button>
+        <div class="btn-group">
+            <button class="btn btn-sm btn-success" tooltip="Editar" (click)="openModal(template)">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" tooltip="Excluir">
+              <i class="fa fa-eraser"></i>
+            </button>
+        </div>        
       </td>
     </tr>    
   </tbody>
@@ -57,3 +63,16 @@
     </tr>
   </tfoot>
 </table>
+
+
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Modal</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    This is a modal.
+  </div>
+</ng-template>
