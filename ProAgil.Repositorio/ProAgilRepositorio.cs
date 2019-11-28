@@ -11,7 +11,7 @@ namespace ProAgil.Repositorio
         public ProAgilRepositorio(ProAgilContext context)
         {
             this._context = context;
-
+            _context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; //assim não travamos o recurso no entity framework, evita falhas nos updates e deletes já que antes dessas ações buscamos o objeto no banco via entity
         }
 
         //GERAIS
@@ -48,7 +48,7 @@ namespace ProAgil.Repositorio
                     .ThenInclude(p => p.Palestrante);
             }
 
-            query = query.OrderByDescending(c => c.DataEvento);
+            query = query.AsNoTracking().OrderByDescending(c => c.DataEvento);
 
             return await query.ToArrayAsync();
         }
@@ -65,7 +65,7 @@ namespace ProAgil.Repositorio
                     .ThenInclude(p => p.Palestrante);
             }
 
-            query = query.OrderByDescending(c => c.DataEvento)
+            query = query.AsNoTracking().OrderByDescending(c => c.DataEvento)
                 .Where(c => c.Tema.ToLower().Contains(tema.ToLower()));
 
             return await query.ToArrayAsync();
@@ -83,7 +83,7 @@ namespace ProAgil.Repositorio
                     .ThenInclude(p => p.Palestrante);
             }
 
-            query = query.OrderByDescending(c => c.DataEvento)
+            query = query.AsNoTracking().OrderByDescending(c => c.DataEvento)
                 .Where(c => c.Id == EventoId);
 
             return await query.FirstOrDefaultAsync();
@@ -102,7 +102,7 @@ namespace ProAgil.Repositorio
                     .ThenInclude(e => e.Evento);
             }
 
-            query = query.OrderBy(p => p.Nome)
+            query = query.AsNoTracking().OrderBy(p => p.Nome)
                 .Where(p => p.Nome.ToLower().Contains(nome.ToLower()));
 
             return await query.ToArrayAsync();
@@ -119,7 +119,7 @@ namespace ProAgil.Repositorio
                     .ThenInclude(e => e.Evento);
             }
 
-            query = query.OrderBy(p => p.Nome)
+            query = query.AsNoTracking().OrderBy(p => p.Nome)
                 .Where(p => p.Id == palestranteId);
 
             return await query.FirstOrDefaultAsync();
