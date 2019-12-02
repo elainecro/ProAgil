@@ -20,6 +20,7 @@ export class EventosComponent implements OnInit {
   imagemMargem = 2;
   mostrarImagem = false;
   registerForm: FormGroup;
+  bodyDeletarEvento: string;
 
   _filtroLista: string;
 
@@ -48,6 +49,7 @@ export class EventosComponent implements OnInit {
   editarEvento(evento: Evento, template: any) {
     this.acao = 'put';
     this.openModal(template);
+    console.log(evento);
     this.evento = evento;
     this.registerForm.patchValue(evento);
   }
@@ -80,16 +82,33 @@ export class EventosComponent implements OnInit {
       dataEvento: ['', Validators.required],
       qtdPessoas: ['',
         [Validators.required, Validators.max(120000)]],
-      imagemURL: ['', Validators.required],
+      imageURL: ['', Validators.required],
       telefone: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]]
     });
   }
 
+  excluirEvento(evento: Evento, template: any) {
+    this.openModal(template);
+    this.evento = evento;
+    this.bodyDeletarEvento = `Tem certeza que deseja excluir o Evento: ${evento.tema}, Código: ${evento.tema}`;
+  }
+
+  confirmeDelete(template: any) {
+    this.eventoService.deleteEvento(this.evento.id).subscribe(
+      () => {
+          template.hide();
+          this.getEventos();
+        }, error => {
+          console.log(error);
+        }
+    );
+  }
+
   salvarAlteracao(template: any) {
     if (this.registerForm.valid) {
-      this.evento = Object.assign({}, this.registerForm.value);
-      if (this.acao === 'post'){
+      if (this.acao === 'post') {
+        this.evento = Object.assign({}, this.registerForm.value);
         this.eventoService.postEvento(this.evento).subscribe(
           (novoEvento: Evento) => {
             console.log(novoEvento);
@@ -100,6 +119,7 @@ export class EventosComponent implements OnInit {
           }
         );
       } else {
+        console.log(this.evento);
         this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
         this.eventoService.putEvento(this.evento).subscribe(
           () => {
