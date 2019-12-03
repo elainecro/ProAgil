@@ -27,7 +27,7 @@ namespace ProAgil.API.Controllers
             try
             {
                 var eventos = await _repo.GetAllEventosAsync(true);
-                var results = _mapper.Map<IEnumerable<EventoDto>>(eventos);
+                var results = _mapper.Map<EventoDto[]>(eventos);
                 return Ok(results);
             }
             catch (System.Exception)
@@ -56,7 +56,8 @@ namespace ProAgil.API.Controllers
         {
             try
             {
-                var results = await _repo.GetAllEventosAsyncByTema(tema, true);
+                var eventos = await _repo.GetAllEventosAsyncByTema(tema, true);
+                var results = _mapper.Map<EventoDto[]>(eventos);
                 return Ok(results);
             }
             catch (System.Exception)
@@ -66,11 +67,12 @@ namespace ProAgil.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(Evento model)
+        public async Task<IActionResult> Post(EventoDto model)
         {
             try
             {
-                _repo.Add(model);
+                var evento = _mapper.Map<Evento>(model);
+                _repo.Add(evento);
 
                 if (await _repo.SaveChangesAsync())
                 {
@@ -82,9 +84,9 @@ namespace ProAgil.API.Controllers
                 }
 
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");
+                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados Falhou: {ex.Message}");
             }
         }
 
