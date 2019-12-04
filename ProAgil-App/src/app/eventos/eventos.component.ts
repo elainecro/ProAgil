@@ -13,6 +13,7 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./eventos.component.css']
 })
 export class EventosComponent implements OnInit {
+  titulo = 'Eventos';
   eventosFiltrados: Evento[] = [];
   eventos: Evento[] = [];
   evento: Evento;
