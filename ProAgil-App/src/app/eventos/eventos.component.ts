@@ -3,7 +3,7 @@ import { EventoService } from '../_services/evento.service';
 import { Evento } from '../_models/Evento';
 import { BsModalService } from 'ngx-bootstrap';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import {defineLocale, BsLocaleService, ptBrLocale } from 'ngx-bootstrap'; //para funcionar o datepicker em pt-BR
+import {defineLocale, BsLocaleService, ptBrLocale } from 'ngx-bootstrap'; // para funcionar o datepicker em pt-BR
 defineLocale('pt-br', ptBrLocale);
 import { ToastrService } from 'ngx-toastr';
 
@@ -139,6 +139,10 @@ export class EventosComponent implements OnInit {
         );
       }
     }
+  }
+
+  onFileChange(event) {
+    console.log(event);
   }
 
   getEventos() {
