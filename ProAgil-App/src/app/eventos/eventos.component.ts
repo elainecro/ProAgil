@@ -24,6 +24,11 @@ export class EventosComponent implements OnInit {
   registerForm: FormGroup;
   bodyDeletarEvento: string;
 
+  file: File;
+  fileNameToUpdate: string;
+
+  dataAtual: string;
+
   _filtroLista: string;
 
   constructor(
@@ -34,6 +39,7 @@ export class EventosComponent implements OnInit {
     private toastr: ToastrService
   ) {
     this.localeService.use('pt-br');
+    this.dataAtual = new Date().getMilliseconds.toString();
   }
 
   get filtroLista(): string {
@@ -52,9 +58,10 @@ export class EventosComponent implements OnInit {
   editarEvento(evento: Evento, template: any) {
     this.acao = 'put';
     this.openModal(template);
-    console.log(evento);
-    this.evento = evento;
-    this.registerForm.patchValue(evento);
+    this.evento = Object.assign({}, evento);
+    this.fileNameToUpdate = evento.imageURL.toString();
+    this.evento.imageURL = '';
+    this.registerForm.patchValue(this.evento);
   }
 
   openModal(template: any) {
@@ -110,10 +117,36 @@ export class EventosComponent implements OnInit {
     );
   }
 
+  uploadImagem() {
+    if (this.acao === 'post') {
+      const nomeArquivo = this.evento.imageURL.split('\\', 3);
+      this.evento.imageURL = nomeArquivo[2];
+      this.eventoService.postUpload(this.file, nomeArquivo[2])
+        .subscribe(
+          () => {
+            this.dataAtual = new Date().getMilliseconds().toString();
+            this.getEventos();
+          }
+        );
+    } else {
+      this.evento.imageURL = this.fileNameToUpdate;
+      this.eventoService.postUpload(this.file, this.fileNameToUpdate)
+      .subscribe(
+        () => {
+          this.dataAtual = new Date().getMilliseconds().toString();
+          this.getEventos();
+        }
+      );
+    }
+  }
+
   salvarAlteracao(template: any) {
     if (this.registerForm.valid) {
       if (this.acao === 'post') {
         this.evento = Object.assign({}, this.registerForm.value);
+
+        this.uploadImagem();
+
         this.eventoService.postEvento(this.evento).subscribe(
           (novoEvento: Evento) => {
             console.log(novoEvento);
@@ -128,6 +161,9 @@ export class EventosComponent implements OnInit {
       } else {
         console.log(this.evento);
         this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+
+        this.uploadImagem();
+
         this.eventoService.putEvento(this.evento).subscribe(
           () => {
             template.hide();
@@ -141,8 +177,13 @@ export class EventosComponent implements OnInit {
     }
   }
 
-  onFileChange(event) {
-    console.log(event);
+  onFileChange(event: any) {
+    const reader = new FileReader();
+
+    if (event.target.files && event.target.files.length) {
+      this.file = event.target.files;
+      console.log(this.file);
+    }
   }
 
   getEventos() {
