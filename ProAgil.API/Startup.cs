@@ -4,17 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using ProAgil.Domain.Identity;
 using ProAgil.Repositorio;
 
 namespace ProAgil.API
@@ -35,9 +39,34 @@ namespace ProAgil.API
             {
                 x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            IdentityBuilder builder = services.AddIdentityCore<User>(options => {
+                options.Password.RequireDigit = false; 
+                options.Password.RequireNonAlphanumeric = false; 
+                options.Password.RequireLowercase = false; 
+                options.Password.RequireUppercase = false; 
+                options.Password.RequiredLength = 4; 
+            }); //configurações de senha
+
+            //configurações que ligam o context com as classes do identity e as classes criadas
+            builder = new IdentityBuilder(builder.UserType, typeof(Role), builder.Services);
+            builder.AddEntityFrameworkStores<ProAgilContext>();
+            builder.AddRoleValidator<RoleValidator<Role>>();
+            builder.AddRoleManager<RoleManager<Role>>();
+            builder.AddSignInManager<SignInManager<User>>();
+
+
+            services.AddMvc(options => {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy)); //configuração que obriga ter um usuário autenticado para acessar qualquer rota
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(opt => opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); //tratamento para qualquer possível loop infinito no retorno do json
+
             services.AddScoped<IProAgilRepositorio, ProAgilRepositorio>();
             services.AddAutoMapper();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors();
         }
 
