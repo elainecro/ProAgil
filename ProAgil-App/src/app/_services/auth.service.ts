@@ -29,12 +29,12 @@ export class AuthService {
   }
 
   register(model: any) {
-    return this.http.post(`${this.baseURL}registration`, model);
+    return this.http.post(`${this.baseURL}Register`, model);
   }
 
   loggedIn() {
     const token = localStorage.getItem('token');
-    return this.jwtHelper.isTokenExpired(token);
+    return !this.jwtHelper.isTokenExpired(token);
   }
 
 }
