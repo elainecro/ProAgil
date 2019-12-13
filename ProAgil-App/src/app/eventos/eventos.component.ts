@@ -192,7 +192,7 @@ export class EventosComponent implements OnInit {
       this.eventos = _eventos;
       this.eventosFiltrados = this.eventos;
     }, error => {
-      this.toastr.success(`Erro ao tentar carregar Eventos: ${error}`);
+      this.toastr.error(`Erro ao tentar carregar Eventos: ${error}`);
     });
   }
 
