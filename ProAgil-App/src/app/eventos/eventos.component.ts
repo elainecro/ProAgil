@@ -24,7 +24,7 @@ export class EventosComponent implements OnInit {
   registerForm: FormGroup;
   bodyDeletarEvento: string;
 
-  file: File;
+  file: FileList;
   fileNameToUpdate: string;
 
   dataAtual: string;
