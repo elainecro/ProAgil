@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -128,6 +129,19 @@ namespace ProAgil.API.Controllers
                 var evento = await _repo.GetEventoAsyncById(eventoId, false);
                 if (evento == null) return NotFound();
 
+                var idLotes = new List<int>();
+                var idRedesSociais = new List<int>();
+
+                model.Lotes.ForEach(item => idLotes.Add(item.Id));
+                model.RedesSociais.ForEach(item => idRedesSociais.Add(item.Id));
+
+                //deleto os itens que não vieram no meu model
+                var lotes = evento.Lotes.Where(lote => !idLotes.Contains(lote.Id)).ToArray();
+                if (lotes.Length > 0) _repo.DeleteRange(lotes);
+
+                var redesSociais = evento.RedesSociais.Where(rs => !idRedesSociais.Contains(rs.Id)).ToArray();
+                if (redesSociais.Length > 0) _repo.DeleteRange(redesSociais);
+                
                 _mapper.Map(model, evento);
                 _repo.Update(evento);
 
@@ -141,7 +155,7 @@ namespace ProAgil.API.Controllers
                 }
 
             }
-            catch (System.Exception)
+            catch (System.Exception e)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");
             }
